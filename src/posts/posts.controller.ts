@@ -28,7 +28,8 @@ import { UpdatePostDto } from './dto/update-post.dto';
 @Controller('posts')
 @ApiUseTags('posts')
 export class PostsController {
-    constructor(private readonly postsService: PostsService) {}
+    constructor(private readonly postsService: PostsService) {
+    }
 
     @Get()
     @ApiOkResponse({ type: [PostDto] })

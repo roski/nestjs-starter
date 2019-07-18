@@ -10,8 +10,8 @@ import {
     DeletedAt,
     HasMany,
 } from 'sequelize-typescript';
-import { Gender } from './../shared/enum/gender';
-import { Post } from './../posts/post.entity';
+import { Gender } from '../shared/enum/gender';
+import { Post } from '../posts/post.entity';
 
 @Table({
     tableName: 'user',

@@ -8,7 +8,7 @@ import { UserLoginResponseDto } from './dto/user-login-response.dto';
 import { JwtPayload } from './auth/jwt-payload.model';
 import { sign } from 'jsonwebtoken';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ConfigService } from './../shared/config/config.service';
+import { ConfigService } from '../shared/config/config.service';
 
 @Injectable()
 export class UsersService {

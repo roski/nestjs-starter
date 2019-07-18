@@ -1,11 +1,11 @@
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../src/app.module';
 import { INestApplication, ValidationPipe, HttpStatus } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
-import { ConfigService } from './../src/shared/config/config.service';
-import { Post } from './../src/posts/post.entity';
-import { User } from './../src/users/user.entity';
+import { ConfigService } from '../src/shared/config/config.service';
+import { Post } from '../src/posts/post.entity';
+import { User } from '../src/users/user.entity';
 import {
     createUserDto1,
     createUserDto2,

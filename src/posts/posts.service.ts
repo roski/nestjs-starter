@@ -1,4 +1,4 @@
-import { User } from './../users/user.entity';
+import { User } from '../users/user.entity';
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './post.entity';

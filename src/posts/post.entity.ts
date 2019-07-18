@@ -13,7 +13,7 @@ import {
     DeletedAt,
     BelongsTo,
 } from 'sequelize-typescript';
-import { User } from './../users/user.entity';
+import { User } from '../users/user.entity';
 
 @Table({
     tableName: 'post',
