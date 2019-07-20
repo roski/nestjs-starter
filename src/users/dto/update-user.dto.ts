@@ -21,5 +21,5 @@ export class UpdateUserDto {
     @ApiModelProperty()
     @IsOptional()
     @IsISO8601()
-    readonly birthday?: string;
+    readonly birthday?: Date;
 }

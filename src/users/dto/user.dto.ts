@@ -19,7 +19,7 @@ export class UserDto {
     readonly gender: Gender;
 
     @ApiModelProperty()
-    readonly birthday: string;
+    readonly birthday: Date;
 
     constructor(user: User) {
         this.id = user.id;

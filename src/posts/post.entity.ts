@@ -1,59 +1,39 @@
-import {
-    Table,
-    PrimaryKey,
-    AutoIncrement,
-    Column,
-    DataType,
-    Model,
-    ForeignKey,
-    Unique,
-    Length,
-    CreatedAt,
-    UpdatedAt,
-    DeletedAt,
-    BelongsTo,
-} from 'sequelize-typescript';
 import { User } from '../users/user.entity';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    RelationId,
+    UpdateDateColumn,
+} from 'typeorm';
+import { Length } from 'class-validator';
 
-@Table({
-    tableName: 'post',
-})
-export class Post extends Model<Post> {
-    @PrimaryKey
-    @AutoIncrement
-    @Column(DataType.BIGINT)
+@Entity()
+export class Post {
+
+    @PrimaryGeneratedColumn()
     id: number;
 
-    @ForeignKey(() => User)
-    @Column({
-        type: DataType.UUID,
-        field: 'user_id',
-    })
-    userId: string;
-
-    @Length({
-        min: 3,
-        max: 60,
-        msg: `The length of post title can't be shorter than 3 and longer than 60 `,
-    })
-    @Column
+    @Length(3, 60, { message: `The length of post title can't be shorter than 3 and longer than 60 ` })
+    @Column({name: 'name'})
     title: string;
 
-    @Column
+    @Column()
     content: string;
 
-    @CreatedAt
-    @Column({ field: 'created_at' })
+    @CreateDateColumn()
     createdAt: Date;
 
-    @UpdatedAt
-    @Column({ field: 'updated_at' })
+    @UpdateDateColumn()
     updatedAt: Date;
 
-    @DeletedAt
-    @Column({ field: 'deleted_at' })
-    deletedAt: Date;
-
-    @BelongsTo(() => User)
+    @ManyToOne(type => User, user => user.posts, { eager: true, onDelete: 'CASCADE' })
+    @JoinColumn()
     user: User;
+
+    @RelationId((post: Post) => post.user)
+    userId: number;
 }

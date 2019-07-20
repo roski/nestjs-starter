@@ -1,12 +1,18 @@
 export const config = {
     database: {
-        dialect: 'postgres',
+        type: 'postgres',
         host: 'localhost',
         port: 5432,
         username: 'postgres',
         password: 'postgres',
         database: 'nest',
-        logging: false,
+        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        migrations: ['db/migrations/*.ts'],
+        synchronize: true,
+        logging: true,
+        cli: {
+            migrationsDir: 'db/migrations'
+        }
     },
     jwtPrivateKey: 'jwtPrivateKey',
 };

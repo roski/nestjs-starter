@@ -17,9 +17,9 @@ import {
     ApiOkResponse,
     ApiImplicitParam,
 } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
-import { AuthGuard } from '@nestjs/passport';
 import { Post as PostEntity } from './post.entity';
 import { PostDto } from './dto/post.dto';
 import { Request } from 'express';
@@ -28,31 +28,32 @@ import { UpdatePostDto } from './dto/update-post.dto';
 @Controller('posts')
 @ApiUseTags('posts')
 export class PostsController {
+
     constructor(private readonly postsService: PostsService) {
     }
 
     @Get()
     @ApiOkResponse({ type: [PostDto] })
-    findAll(): Promise<PostDto[]> {
-        return this.postsService.findAll();
+    findAllPosts(): Promise<PostDto[]> {
+        return this.postsService.findAllPosts();
     }
 
     @Get(':id')
     @ApiOkResponse({ type: PostDto })
     @ApiImplicitParam({ name: 'id', required: true })
-    findOne(@Param('id', new ParseIntPipe()) id: number): Promise<PostDto> {
-        return this.postsService.findOne(id);
+    findOnePost(@Param('id', new ParseIntPipe()) id: number): Promise<PostDto> {
+        return this.postsService.findOnePost(id);
     }
 
     @Post()
     @ApiCreatedResponse({ type: PostEntity })
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
-    create(
+    createPost(
         @Body() createPostDto: CreatePostDto,
         @Req() request,
     ): Promise<PostEntity> {
-        return this.postsService.create(request.user.id, createPostDto);
+        return this.postsService.createPost(request.user.id, createPostDto);
     }
 
     @Put(':id')
@@ -60,12 +61,12 @@ export class PostsController {
     @ApiImplicitParam({ name: 'id', required: true })
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
-    update(
+    updatePost(
         @Param('id', new ParseIntPipe()) id: number,
         @Req() request: Request,
         @Body() updatePostDto: UpdatePostDto,
     ): Promise<PostEntity> {
-        return this.postsService.update(id, request.user.id, updatePostDto);
+        return this.postsService.updatePost(id, request.user.id, updatePostDto);
     }
 
     @Delete(':id')
@@ -73,10 +74,10 @@ export class PostsController {
     @ApiImplicitParam({ name: 'id', required: true })
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
-    delete(
+    deletePost(
         @Param('id', new ParseIntPipe()) id: number,
         @Req() request: Request,
     ): Promise<PostEntity> {
-        return this.postsService.delete(id, request.user.id);
+        return this.postsService.deletePost(id, request.user.id);
     }
 }

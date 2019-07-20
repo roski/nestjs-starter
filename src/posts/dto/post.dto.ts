@@ -6,7 +6,7 @@ export class PostDto {
     readonly id: number;
 
     @ApiModelProperty()
-    readonly authorId: string;
+    readonly authorId: number;
 
     @ApiModelProperty()
     readonly authorFirstName: string;

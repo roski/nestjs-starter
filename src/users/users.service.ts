@@ -1,6 +1,14 @@
-import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
+import {
+    Injectable,
+    HttpException,
+    HttpStatus,
+} from '@nestjs/common';
 import { User } from './user.entity';
-import { genSalt, hash, compare } from 'bcrypt';
+import {
+    genSalt,
+    hash,
+    compare,
+} from 'bcrypt';
 import { UserDto } from './dto/user.dto';
 import { UserLoginRequestDto } from './dto/user-login-request.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -9,45 +17,47 @@ import { JwtPayload } from './auth/jwt-payload.model';
 import { sign } from 'jsonwebtoken';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ConfigService } from '../shared/config/config.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
     private readonly jwtPrivateKey: string;
 
     constructor(
-        @Inject('UsersRepository')
-        private readonly usersRepository: typeof User,
+        @InjectRepository(User)
+        private readonly usersRepository: Repository<User>,
         private readonly configService: ConfigService,
     ) {
         this.jwtPrivateKey = this.configService.jwtConfig.privateKey;
     }
 
-    async findAll(): Promise<UserDto[]> {
-        const users = await this.usersRepository.findAll<User>();
+    async findAllUsers(): Promise<UserDto[]> {
+        const users = await this.usersRepository.find();
         return users.map(user => {
             return new UserDto(user);
         });
     }
 
     async getUser(id: string): Promise<UserDto> {
-        const user = await this.usersRepository.findByPk<User>(id);
-        if (!user) {
+        const user = await this.usersRepository.findByIds([id]);
+        if (!user && !user.length) {
             throw new HttpException(
                 'User with given id not found',
                 HttpStatus.NOT_FOUND,
             );
         }
 
-        return new UserDto(user);
+        return new UserDto(user[0]);
     }
 
     async getUserByEmail(email: string): Promise<User> {
-        return await this.usersRepository.findOne<User>({
+        return await this.usersRepository.findOne({
             where: { email },
         });
     }
 
-    async create(createUserDto: CreateUserDto): Promise<UserLoginResponseDto> {
+    async createUser(createUserDto: CreateUserDto): Promise<UserLoginResponseDto> {
         try {
             const user = new User();
             user.email = createUserDto.email.trim().toLowerCase();
@@ -59,7 +69,7 @@ export class UsersService {
             const salt = await genSalt(10);
             user.password = await hash(createUserDto.password, salt);
 
-            const userData = await user.save();
+            const userData = await this.usersRepository.save(user);
 
             // when registering then log user in automatically by returning a token
             const token = await this.signToken(userData);
@@ -102,11 +112,12 @@ export class UsersService {
         return new UserLoginResponseDto(user, token);
     }
 
-    async update(id: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
-        const user = await this.usersRepository.findByPk<User>(id);
-        if (!user) {
+    async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
+        const users = await this.usersRepository.findByIds([id]);
+        if (!users && !users.length) {
             throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
         }
+        const user = users[0];
 
         user.firstName = updateUserDto.firstName || user.firstName;
         user.lastName = updateUserDto.lastName || user.lastName;
@@ -114,16 +125,16 @@ export class UsersService {
         user.birthday = updateUserDto.birthday || user.birthday;
 
         try {
-            const data = await user.save();
+            const data = await this.usersRepository.save(user);
             return new UserDto(data);
         } catch (err) {
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    async delete(id: string): Promise<UserDto> {
-        const user = await this.usersRepository.findByPk<User>(id);
-        await user.destroy();
+    async deleteUser(id: string): Promise<UserDto> {
+        const user = await this.usersRepository.findOne(id);
+        await this.usersRepository.remove(user);
         return new UserDto(user);
     }
 

@@ -25,10 +25,10 @@ export class UsersController {
 
     @Post('register')
     @ApiOkResponse({ type: UserLoginResponseDto })
-    register(
+    registerUser(
         @Body() createUserDto: CreateUserDto,
     ): Promise<UserLoginResponseDto> {
-        return this.usersService.create(createUserDto);
+        return this.usersService.createUser(createUserDto);
     }
 
     @Post('login')
@@ -45,7 +45,7 @@ export class UsersController {
     @UseGuards(AuthGuard('jwt'))
     @ApiOkResponse({ type: [UserDto] })
     findAll(): Promise<UserDto[]> {
-        return this.usersService.findAll();
+        return this.usersService.findAllUsers();
     }
 
     @Get('me')
@@ -60,18 +60,18 @@ export class UsersController {
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @ApiOkResponse({ type: UserDto })
-    update(
+    updateUser(
         @Body() updateUserDto: UpdateUserDto,
         @Req() request,
     ): Promise<UserDto> {
-        return this.usersService.update(request.user.id, updateUserDto);
+        return this.usersService.updateUser(request.user.id, updateUserDto);
     }
 
     @Delete('me')
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @ApiOkResponse({ type: UserDto })
-    delete(@Req() request): Promise<UserDto> {
-        return this.usersService.delete(request.user.id);
+    deleteUser(@Req() request): Promise<UserDto> {
+        return this.usersService.deleteUser(request.user.id);
     }
 }

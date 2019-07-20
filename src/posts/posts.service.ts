@@ -1,30 +1,35 @@
-import { User } from '../users/user.entity';
-import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
+import {
+    Injectable,
+    HttpException,
+    HttpStatus,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './post.entity';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { Repository } from 'typeorm';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class PostsService {
     constructor(
-        @Inject('PostsRepository')
-        private readonly postsRepository: typeof Post,
-    ) {}
+        @InjectRepository(Post)
+        private readonly postsRepository: Repository<Post>,
+        @InjectRepository(User)
+        private readonly usersRepository: Repository<User>,
+    ) {
+    }
 
-    async findAll(): Promise<PostDto[]> {
-        const posts = await this.postsRepository.findAll<Post>({
-            include: [User],
-        });
+    async findAllPosts(): Promise<PostDto[]> {
+        const posts = await this.postsRepository.find();
         return posts.map(post => {
             return new PostDto(post);
         });
     }
 
-    async findOne(id: number): Promise<PostDto> {
-        const post = await this.postsRepository.findByPk<Post>(id, {
-            include: [User],
-        });
+    async findOnePost(id: number): Promise<PostDto> {
+        const post = await this.postsRepository.findOne(id);
         if (!post) {
             throw new HttpException('No post found', HttpStatus.NOT_FOUND);
         }
@@ -32,25 +37,24 @@ export class PostsService {
         return new PostDto(post);
     }
 
-    async create(userId: string, createPostDto: CreatePostDto): Promise<Post> {
+    async createPost(userId: number, createPostDto: CreatePostDto): Promise<Post> {
+        const user = await this.usersRepository.findOne(userId);
         const post = new Post();
-        post.userId = userId;
+        post.user = user;
         post.title = createPostDto.title;
         post.content = createPostDto.content;
-
         try {
-            return await post.save();
+            return await this.postsRepository.save(post);
         } catch (err) {
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private async getUserPost(id: number, userId: string): Promise<Post> {
-        const post = await this.postsRepository.findByPk<Post>(id);
+    private async getUserPost(id: number, userId: number): Promise<Post> {
+        const post = await this.postsRepository.findOne(id);
         if (!post) {
             throw new HttpException('No post found', HttpStatus.NOT_FOUND);
         }
-
         if (post.userId !== userId) {
             throw new HttpException(
                 'You are unauthorized to manage this post',
@@ -61,9 +65,9 @@ export class PostsService {
         return post;
     }
 
-    async update(
+    async updatePost(
         id: number,
-        userId: string,
+        userId: number,
         updatePostDto: UpdatePostDto,
     ): Promise<Post> {
         const post = await this.getUserPost(id, userId);
@@ -72,15 +76,15 @@ export class PostsService {
         post.content = updatePostDto.content || post.content;
 
         try {
-            return await post.save();
+            return await this.postsRepository.save(post);
         } catch (err) {
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    async delete(id: number, userId: string): Promise<Post> {
+    async deletePost(id: number, userId: number): Promise<Post> {
         const post = await this.getUserPost(id, userId);
-        await post.destroy();
+        await this.postsRepository.delete(post);
         return post;
     }
 }

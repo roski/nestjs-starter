@@ -1,61 +1,48 @@
-import {
-    Table,
-    Column,
-    Model,
-    Unique,
-    IsEmail,
-    DataType,
-    CreatedAt,
-    UpdatedAt,
-    DeletedAt,
-    HasMany,
-} from 'sequelize-typescript';
 import { Gender } from '../shared/enum/gender';
 import { Post } from '../posts/post.entity';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    Unique,
+    UpdateDateColumn,
+} from 'typeorm';
+import { IsEmail } from 'class-validator';
 
-@Table({
-    tableName: 'user',
-})
-export class User extends Model<User> {
-    @Column({
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
-        primaryKey: true,
-    })
+@Unique(['email'])
+@Entity()
+export class User {
+
+    @PrimaryGeneratedColumn()
     id: string;
 
-    @Unique
-    @IsEmail
-    @Column
+    @IsEmail()
+    @Column()
     email: string;
 
-    @Column
+    @Column()
     password: string;
 
-    @Column({ field: 'first_name' })
+    @Column()
     firstName: string;
 
-    @Column({ field: 'last_name' })
+    @Column()
     lastName: string;
 
-    @Column({ type: DataType.ENUM(Gender.female, Gender.male) })
+    @Column('text')
     gender: Gender;
 
-    @Column(DataType.DATEONLY)
-    birthday: string;
+    @Column()
+    birthday: Date;
 
-    @CreatedAt
-    @Column({ field: 'created_at' })
+    @CreateDateColumn()
     createdAt: Date;
 
-    @UpdatedAt
-    @Column({ field: 'updated_at' })
+    @UpdateDateColumn()
     updatedAt: Date;
 
-    @DeletedAt
-    @Column({ field: 'deleted_at' })
-    deletedAt: Date;
-
-    @HasMany(() => Post)
+    @OneToMany(type => Post, post => post.user, { cascade: true })
     posts: Post[];
 }

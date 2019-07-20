@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { SequelizeOrmConfig } from './interfaces/sequelize-orm-config.interface';
 import { JwtConfig } from './interfaces/jwt-config.interface';
 import config from '../../../config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 @Injectable()
 export class ConfigService {
-    get sequelizeOrmConfig(): SequelizeOrmConfig {
+    get typeOrmConfig(): TypeOrmModuleOptions {
         return config.database;
     }
 
