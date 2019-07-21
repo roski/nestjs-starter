@@ -8,7 +8,8 @@ export const config = {
         database: 'nest',
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         migrations: ['db/migrations/*.ts'],
-        synchronize: true,
+        synchronize: false,
+        migrationsRun: true,
         logging: true,
         cli: {
             migrationsDir: 'db/migrations'
