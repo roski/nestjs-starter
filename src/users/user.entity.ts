@@ -31,7 +31,7 @@ export class User {
     @Column()
     lastName: string;
 
-    @Column('text')
+    @Column('enum', { nullable: false, enum: Gender })
     gender: Gender;
 
     @Column()
