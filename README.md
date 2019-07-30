@@ -1,5 +1,5 @@
 ![Nest](assets/readme-images/readme-logo.png)
-#Nest Starter [![Gitter](https://badges.gitter.im/NestJS-Starter/community.svg)](https://gitter.im/NestJS-Starter/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+# Nest Starter [![Gitter](https://badges.gitter.im/NestJS-Starter/community.svg)](https://gitter.im/NestJS-Starter/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 This seed repo serves as an Nest starter for anyone looking to get up and running with [Nest](https://github.com/nestjs/nest) and TypeScript fast.
 
